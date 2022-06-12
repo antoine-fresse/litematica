@@ -186,7 +186,7 @@ public class WorldRendererSchematic
             }
 
             this.displayListEntitiesDirty = true;
-            this.renderDistanceChunks = this.mc.options.viewDistance;
+            this.renderDistanceChunks = this.mc.options.getViewDistance().getValue();
 
             if (this.chunkRendererDispatcher != null)
             {
@@ -223,7 +223,7 @@ public class WorldRendererSchematic
     {
         this.world.getProfiler().push("setup_terrain");
 
-        if (this.chunkRendererDispatcher == null || this.mc.options.viewDistance != this.renderDistanceChunks)
+        if (this.chunkRendererDispatcher == null || this.mc.options.getViewDistance().getValue() != this.renderDistanceChunks)
         {
             this.loadRenderers();
         }
@@ -277,7 +277,7 @@ public class WorldRendererSchematic
         BlockPos viewPos = new BlockPos(cameraX, cameraY + (double) entity.getStandingEyeHeight(), cameraZ);
         final int centerChunkX = (viewPos.getX() >> 4);
         final int centerChunkZ = (viewPos.getZ() >> 4);
-        final int renderDistance = this.mc.options.viewDistance;
+        final int renderDistance = this.mc.options.getViewDistance().getValue();
         SubChunkPos viewSubChunk = new SubChunkPos(centerChunkX, viewPos.getY() >> 4, centerChunkZ);
         BlockPos viewPosSubChunk = new BlockPos(viewSubChunk.getX() << 4, viewSubChunk.getY() << 4, viewSubChunk.getZ() << 4);
 
@@ -493,14 +493,27 @@ public class WorldRendererSchematic
                 BlockPos chunkOrigin = renderer.getOrigin();
                 VertexBuffer buffer = renderer.getBlocksVertexBufferByLayer(renderLayer);
 
+                if(buffer.getVertexFormat().getVertexSizeByte() == 0)
+                {
+                    continue;
+                }
+
                 if (chunkOffsetUniform != null)
                 {
                     chunkOffsetUniform.set((float)(chunkOrigin.getX() - x), (float)(chunkOrigin.getY() - y), (float)(chunkOrigin.getZ() - z));
                     chunkOffsetUniform.upload();
                 }
 
+                //if(!startedDrawing)
+                buffer.getVertexFormat().setupState();
+
                 buffer.bind();
-                buffer.drawVertices();
+                buffer.draw(matrices.peek().getPositionMatrix(), projMatrix, shader);
+                //buffer.drawElements();
+                buffer.unbind();
+
+                buffer.getVertexFormat().clearState();
+
                 startedDrawing = true;
 
                 ++count;
@@ -521,11 +534,11 @@ public class WorldRendererSchematic
 
         if (startedDrawing)
         {
-            renderLayer.getVertexFormat().endDrawing();
+            //renderLayer.getVertexFormat().clearState();
         }
 
         VertexBuffer.unbind();
-        VertexBuffer.unbindVertexArray();
+        //VertexBuffer.unbindVertexArray();
         renderLayer.endDrawing();
 
         this.world.getProfiler().pop();
@@ -602,7 +615,7 @@ public class WorldRendererSchematic
 
                     matrixStack.push();
                     matrixStack.translate(chunkOrigin.getX() - x, chunkOrigin.getY() - y, chunkOrigin.getZ() - z);
-                    buffer.setShader(matrixStack.peek().getPositionMatrix(), projMatrix, shader);
+                    buffer.draw(matrixStack.peek().getPositionMatrix(), projMatrix, shader);
                     matrixStack.pop();
                 }
             }
@@ -641,9 +654,9 @@ public class WorldRendererSchematic
         }
     }
 
-    public boolean renderFluid(BlockRenderView world, FluidState state, BlockPos pos, BufferBuilder bufferBuilderIn)
+    public void renderFluid(BlockRenderView world, FluidState state, BlockPos pos, BufferBuilder bufferBuilderIn)
     {
-        return this.blockRenderManager.renderFluid(pos, world, bufferBuilderIn, state.getBlockState(), state);
+        this.blockRenderManager.renderFluid(pos, world, bufferBuilderIn, state.getBlockState(), state);
     }
 
     public BakedModel getModelForState(BlockState state)

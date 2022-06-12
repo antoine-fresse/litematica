@@ -1,7 +1,7 @@
 package fi.dy.masa.litematica.render;
 
 import java.util.List;
-import java.util.Random;
+import net.minecraft.util.math.random.Random;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
@@ -26,7 +26,7 @@ import fi.dy.masa.malilib.util.StringUtils;
 
 public class RenderUtils
 {
-    private static final Random RAND = new Random();
+    private static final Random RAND = Random.create();
 
     public static int getMaxStringRenderLength(List<String> list)
     {

@@ -31,6 +31,7 @@ import net.minecraft.util.registry.DynamicRegistryManager;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryEntry;
 import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.LightType;
 import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.World;
@@ -42,6 +43,7 @@ import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.entity.EntityLookup;
 import net.minecraft.world.event.GameEvent;
+import net.minecraft.world.event.GameEvent.Emitter;
 import net.minecraft.world.tick.EmptyTickSchedulers;
 import net.minecraft.world.tick.QueryableTickScheduler;
 import fi.dy.masa.litematica.Reference;
@@ -51,7 +53,7 @@ import fi.dy.masa.litematica.render.schematic.WorldRendererSchematic;
 public class WorldSchematic extends World
 {
     private static final RegistryKey<World> REGISTRY_KEY = RegistryKey.of(Registry.WORLD_KEY, new Identifier(Reference.MOD_ID, "schematic_world"));
-
+    
     private final MinecraftClient mc;
     private final WorldRendererSchematic worldRenderer;
     private final ChunkManagerSchematic chunkManagerSchematic;
@@ -63,7 +65,7 @@ public class WorldSchematic extends World
                              RegistryEntry<DimensionType> dimensionType,
                              Supplier<Profiler> supplier)
     {
-        super(mutableWorldProperties, REGISTRY_KEY, dimensionType, supplier, true, true, 0L);
+        super(mutableWorldProperties, REGISTRY_KEY, dimensionType, supplier, true, true, 0L, 100000);
 
         this.mc = MinecraftClient.getInstance();
         this.worldRenderer = LitematicaRenderer.getInstance().getWorldRenderer();
@@ -436,6 +438,12 @@ public class WorldSchematic extends World
     }
 
     @Override
+    public void emitGameEvent(GameEvent event, Vec3d pos, Emitter emitter)
+    {
+        // NO-OP
+    }
+
+    @Override
     public void addParticle(ParticleEffect particleParameters_1, double double_1, double double_2, double double_3, double double_4, double double_5, double double_6)
     {
         // NO-OP
@@ -478,7 +486,19 @@ public class WorldSchematic extends World
     }
 
     @Override
+    public void playSound(PlayerEntity player, double x, double y, double z, SoundEvent soundIn, SoundCategory category, float volume, float pitch, long seed)
+    {
+        // NO-OP
+    }
+
+    @Override
     public void playSoundFromEntity(@Nullable PlayerEntity player, Entity entity, SoundEvent sound, SoundCategory category, float volume, float pitch)
+    {
+        // NO-OP
+    }
+
+    @Override
+    public void playSoundFromEntity(@Nullable PlayerEntity player, Entity entity, SoundEvent sound, SoundCategory category, float volume, float pitch, long seed)
     {
         // NO-OP
     }

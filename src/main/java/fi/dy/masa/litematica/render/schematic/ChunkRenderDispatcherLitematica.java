@@ -267,7 +267,7 @@ public class ChunkRenderDispatcherLitematica
         return flag;
     }
 
-    public ListenableFuture<Object> uploadChunkBlocks(final RenderLayer layer, final BufferBuilder buffer,
+    public ListenableFuture<Object> uploadChunkBlocks(final RenderLayer layer, final BufferBuilder.BuiltBuffer buffer,
             final ChunkRendererSchematicVbo renderChunk, final ChunkRenderDataSchematic chunkRenderData, final double distanceSq)
     {
         if (MinecraftClient.getInstance().isOnThread())
@@ -295,7 +295,7 @@ public class ChunkRenderDispatcherLitematica
         }
     }
 
-    public ListenableFuture<Object> uploadChunkOverlay(final OverlayRenderType type, final BufferBuilder buffer,
+    public ListenableFuture<Object> uploadChunkOverlay(final OverlayRenderType type, final BufferBuilder.BuiltBuffer buffer,
             final ChunkRendererSchematicVbo renderChunk, final ChunkRenderDataSchematic compiledChunk, final double distanceSq)
     {
         if (MinecraftClient.getInstance().isOnThread())
@@ -323,9 +323,10 @@ public class ChunkRenderDispatcherLitematica
         }
     }
 
-    private void uploadVertexBuffer(BufferBuilder buffer, VertexBuffer vertexBuffer)
+    private void uploadVertexBuffer(BufferBuilder.BuiltBuffer buffer, VertexBuffer vertexBuffer)
     {
-        vertexBuffer.submitUpload(buffer);
+        vertexBuffer.bind();
+        vertexBuffer.upload(buffer);
     }
 
     public void clearChunkUpdates()

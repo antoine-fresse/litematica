@@ -1,7 +1,7 @@
 package fi.dy.masa.litematica.gui.widgets;
 
 import java.util.List;
-import java.util.Random;
+import net.minecraft.util.math.random.Random;
 import javax.annotation.Nullable;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.Block;
@@ -52,7 +52,7 @@ import fi.dy.masa.malilib.util.StringUtils;
 
 public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<BlockMismatchEntry>
 {
-    private static final Random RAND = new Random();
+    private static final Random RAND = Random.create();
 
     public static final String HEADER_EXPECTED = "litematica.gui.label.schematic_verifier.expected";
     public static final String HEADER_FOUND = "litematica.gui.label.schematic_verifier.found";

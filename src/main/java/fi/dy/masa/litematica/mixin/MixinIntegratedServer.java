@@ -19,6 +19,7 @@ import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.UserCache;
 import net.minecraft.world.level.storage.LevelStorage;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
+import net.minecraft.util.ApiServices;
 
 @Mixin(IntegratedServer.class)
 public abstract class MixinIntegratedServer extends MinecraftServer
@@ -29,12 +30,10 @@ public abstract class MixinIntegratedServer extends MinecraftServer
                                   SaveLoader saveLoader,
                                   Proxy proxy,
                                   DataFixer dataFixer,
-                                  @Nullable MinecraftSessionService sessionService,
-                                  @Nullable GameProfileRepository gameProfileRepo,
-                                  @Nullable UserCache userCache,
+                                  ApiServices apiServices,
                                   WorldGenerationProgressListenerFactory worldGenerationProgressListenerFactory)
     {
-        super(serverThread, session, dataPackManager, saveLoader, proxy, dataFixer, sessionService, gameProfileRepo, userCache, worldGenerationProgressListenerFactory);
+        super(serverThread, session, dataPackManager, saveLoader, proxy, dataFixer, apiServices, worldGenerationProgressListenerFactory);
     }
 
     @Inject(method = "tick", at = @At(value = "INVOKE", shift = Shift.AFTER,

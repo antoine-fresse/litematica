@@ -211,7 +211,8 @@ public class ChunkRendererSchematicVbo
                 RenderSystem.setShader(GameRenderer::getRenderTypeTranslucentShader);
                 this.preRenderBlocks(buffer, layerTranslucent);
                 buffer.restoreState(bufferState);
-                this.postRenderBlocks(layerTranslucent, x, y, z, buffer, data);
+                BufferBuilder.BuiltBuffer builtbuffer = this.postRenderBlocks(layerTranslucent, x, y, z, buffer, data);
+                buffers.builtBufferBuilders.put(buffer, builtbuffer);
             }
         }
 
@@ -227,7 +228,8 @@ public class ChunkRendererSchematicVbo
 
                 this.preRenderOverlay(buffer, type.getDrawMode());
                 buffer.restoreState(bufferState);
-                this.postRenderOverlay(type, x, y, z, buffer, data);
+                BufferBuilder.BuiltBuffer builtbuffer = this.postRenderOverlay(type, x, y, z, buffer, data);
+                buffers.builtBufferBuilders.put(buffer, builtbuffer);
             }
         }
     }
@@ -307,7 +309,9 @@ public class ChunkRendererSchematicVbo
 
                     if (data.isBlockLayerStarted(layerTmp))
                     {
-                        this.postRenderBlocks(layerTmp, x, y, z, buffers.getBlockBufferByLayer(layerTmp), data);
+                        var buffer = buffers.getBlockBufferByLayer(layerTmp);
+                        BufferBuilder.BuiltBuffer builtbuffer = this.postRenderBlocks(layerTmp, x, y, z, buffer, data);
+                        buffers.builtBufferBuilders.put(buffer, builtbuffer);
                     }
                 }
 
@@ -319,7 +323,9 @@ public class ChunkRendererSchematicVbo
                         if (data.isOverlayTypeStarted(type))
                         {
                             data.setOverlayTypeUsed(type);
-                            this.postRenderOverlay(type, x, y, z, buffers.getOverlayBuffer(type), data);
+                            var buffer = buffers.getOverlayBuffer(type);
+                            BufferBuilder.BuiltBuffer builtbuffer = this.postRenderOverlay(type, x, y, z, buffer, data);
+                            buffers.builtBufferBuilders.put(buffer, builtbuffer);
                         }
                     }
                 }
@@ -386,7 +392,7 @@ public class ChunkRendererSchematicVbo
                     this.preRenderBlocks(bufferSchematic, layer);
                 }
 
-                if (this.worldRenderer.renderFluid(this.schematicWorldView, fluidState, pos, bufferSchematic))
+                /*if (*/this.worldRenderer.renderFluid(this.schematicWorldView, fluidState, pos, bufferSchematic);//)
                 {
                     usedLayers.add(layer);
                 }
@@ -745,7 +751,7 @@ public class ChunkRendererSchematicVbo
         buffer.begin(VertexFormat.DrawMode.QUADS, layer.getVertexFormat());
     }
 
-    private void postRenderBlocks(RenderLayer layer, float x, float y, float z, BufferBuilder buffer, ChunkRenderDataSchematic chunkRenderData)
+    private BufferBuilder.BuiltBuffer postRenderBlocks(RenderLayer layer, float x, float y, float z, BufferBuilder buffer, ChunkRenderDataSchematic chunkRenderData)
     {
         if (layer == RenderLayer.getTranslucent() && chunkRenderData.isBlockLayerEmpty(layer) == false)
         {
@@ -753,7 +759,7 @@ public class ChunkRendererSchematicVbo
             chunkRenderData.setBlockBufferState(layer, buffer.popState());
         }
 
-        buffer.end();
+        return buffer.end();
     }
 
     private void preRenderOverlay(BufferBuilder buffer, OverlayRenderType type)
@@ -771,7 +777,7 @@ public class ChunkRendererSchematicVbo
         buffer.begin(drawMode, VertexFormats.POSITION_COLOR);
     }
 
-    private void postRenderOverlay(OverlayRenderType type, float x, float y, float z, BufferBuilder buffer, ChunkRenderDataSchematic chunkRenderData)
+    private BufferBuilder.BuiltBuffer postRenderOverlay(OverlayRenderType type, float x, float y, float z, BufferBuilder buffer, ChunkRenderDataSchematic chunkRenderData)
     {
         RenderSystem.applyModelViewMatrix();
         if (type == OverlayRenderType.QUAD && chunkRenderData.isOverlayTypeEmpty(type) == false)
@@ -780,7 +786,7 @@ public class ChunkRendererSchematicVbo
             chunkRenderData.setOverlayBufferState(type, buffer.popState());
         }
 
-        buffer.end();
+        return buffer.end();
     }
 
     public ChunkRenderTaskSchematic makeCompileTaskChunkSchematic(Supplier<Vec3d> cameraPosSupplier)

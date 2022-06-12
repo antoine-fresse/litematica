@@ -18,7 +18,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.structure.Structure;
+import net.minecraft.structure.StructureTemplate;
 import net.minecraft.structure.StructurePlacementData;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
@@ -111,7 +111,7 @@ public class SchematicaSchematic
                         BlockPos pos = new BlockPos(x, y, z);
                         NbtCompound teNBT = this.tiles.get(pos);
 
-                        pos = Structure.transform(placement, pos).add(posStart);
+                        pos = StructureTemplate.transform(placement, pos).add(posStart);
 
                         state = state.mirror(mirror);
                         state = state.rotate(rotation);
@@ -167,7 +167,7 @@ public class SchematicaSchematic
                             BlockPos pos = new BlockPos(x, y, z);
                             NbtCompound teNBT = this.tiles.get(pos);
 
-                            pos = Structure.transform(placement, pos).add(posStart);
+                            pos = StructureTemplate.transform(placement, pos).add(posStart);
                             world.updateNeighbors(pos, world.getBlockState(pos).getBlock());
 
                             if (teNBT != null)
@@ -331,7 +331,7 @@ public class SchematicaSchematic
                 StructureBlockMode.valueOf(tag.getString("mode")) == StructureBlockMode.DATA)
             {
                 BlockPos pos = entry.getKey();
-                pos = Structure.transform(placement, pos).add(posStart);
+                pos = StructureTemplate.transform(placement, pos).add(posStart);
                 map.put(pos, tag.getString("metadata"));
             }
         }

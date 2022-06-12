@@ -32,7 +32,7 @@ import net.minecraft.nbt.NbtIo;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.state.property.Property;
-import net.minecraft.structure.Structure;
+import net.minecraft.structure.StructureTemplate;
 import net.minecraft.structure.StructurePlacementData;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -205,12 +205,12 @@ public class WorldUtils
     public static boolean convertLitematicaSchematicToVanillaStructure(
             File inputDir, String inputFileName, File outputDir, String outputFileName, boolean ignoreEntities, boolean override, IStringConsumer feedback)
     {
-        Structure template = convertLitematicaSchematicToVanillaStructure(inputDir, inputFileName, ignoreEntities, feedback);
+        StructureTemplate template = convertLitematicaSchematicToVanillaStructure(inputDir, inputFileName, ignoreEntities, feedback);
         return writeVanillaStructureToFile(template, outputDir, outputFileName, override, feedback);
     }
 
     @Nullable
-    public static Structure convertLitematicaSchematicToVanillaStructure(File inputDir, String inputFileName, boolean ignoreEntities, IStringConsumer feedback)
+    public static StructureTemplate convertLitematicaSchematicToVanillaStructure(File inputDir, String inputFileName, boolean ignoreEntities, IStringConsumer feedback)
     {
         LitematicaSchematic litematicaSchematic = LitematicaSchematic.createFromFile(inputDir, inputFileName);
 
@@ -227,13 +227,13 @@ public class WorldUtils
         SchematicPlacement schematicPlacement = SchematicPlacement.createForSchematicConversion(litematicaSchematic, BlockPos.ORIGIN);
         litematicaSchematic.placeToWorld(world, schematicPlacement, false); // TODO use a per-chunk version for a bit more speed
 
-        Structure template = new Structure();
+        StructureTemplate template = new StructureTemplate();
         template.saveFromWorld(world, BlockPos.ORIGIN, size, ignoreEntities == false, Blocks.STRUCTURE_VOID);
 
         return template;
     }
 
-    private static boolean writeVanillaStructureToFile(Structure template, File dir, String fileNameIn, boolean override, IStringConsumer feedback)
+    private static boolean writeVanillaStructureToFile(StructureTemplate template, File dir, String fileNameIn, boolean override, IStringConsumer feedback)
     {
         String fileName = fileNameIn;
         String extension = ".nbt";
@@ -275,10 +275,10 @@ public class WorldUtils
         return false;
     }
 
-    private static Structure readTemplateFromStream(InputStream stream, DataFixer fixer) throws IOException
+    private static StructureTemplate readTemplateFromStream(InputStream stream, DataFixer fixer) throws IOException
     {
         NbtCompound nbt = NbtIo.readCompressed(stream);
-        Structure template = new Structure();
+        StructureTemplate template = new StructureTemplate();
         //template.read(fixer.process(FixTypes.STRUCTURE, nbt));
         template.readNbt(nbt);
 
@@ -534,7 +534,7 @@ public class WorldUtils
 
                 //System.out.printf("pos: %s side: %s, hit: %s\n", pos, side, hitPos);
                 // pos, side, hitPos
-                mc.interactionManager.interactBlock(mc.player, mc.world, hand, hitResult);
+                mc.interactionManager.interactBlock(mc.player, hand, hitResult);
 
                 if (stateSchematic.getBlock() instanceof SlabBlock && stateSchematic.get(SlabBlock.TYPE) == SlabType.DOUBLE)
                 {
@@ -544,7 +544,7 @@ public class WorldUtils
                     {
                         side = applyPlacementFacing(stateSchematic, sideOrig, stateClient);
                         hitResult = new BlockHitResult(hitPos, side, pos, false);
-                        mc.interactionManager.interactBlock(mc.player, mc.world, hand, hitResult);
+                        mc.interactionManager.interactBlock(mc.player, hand, hitResult);
                     }
                 }
             }

@@ -2,7 +2,7 @@ package fi.dy.masa.litematica.render.schematic;
 
 import java.util.BitSet;
 import java.util.List;
-import java.util.Random;
+import net.minecraft.util.math.random.Random;
 import javax.annotation.Nullable;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -24,7 +24,7 @@ import fi.dy.masa.malilib.util.PositionUtils;
 
 public class BlockModelRendererSchematic
 {
-    private final Random random = new Random();
+    private final Random random = Random.create();
     private final BlockColors colorMap;
 
     public BlockModelRendererSchematic(BlockColors blockColorsIn)

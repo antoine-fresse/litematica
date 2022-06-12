@@ -55,7 +55,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
             catch (Throwable throwable)
             {
                 CrashReport crashreport = CrashReport.create(throwable, "Batching chunks");
-                MinecraftClient.getInstance().setCrashReportSupplier(() -> MinecraftClient.getInstance().addDetailsToCrashReport(crashreport));
+                //MinecraftClient.getInstance().setCrashReportSupplier(() -> MinecraftClient.getInstance().addDetailsToCrashReport(crashreport));
                 return;
             }
         }
@@ -142,7 +142,8 @@ public class ChunkRenderWorkerLitematica implements Runnable
                         //if (GuiBase.isCtrlDown()) System.out.printf("REBUILD_CHUNK pre uploadChunkBlocks()\n");
                         //System.out.printf("REBUILD_CHUNK pre uploadChunkBlocks(%s)\n", layer.toString());
                         BufferBuilder buffer = buffers.getBlockBufferByLayer(layer);
-                        futuresList.add(this.chunkRenderDispatcher.uploadChunkBlocks(layer, buffer, renderChunk, chunkRenderData, task.getDistanceSq()));
+                        futuresList.add(this.chunkRenderDispatcher.uploadChunkBlocks(layer, buffers.builtBufferBuilders.get(buffer), renderChunk, chunkRenderData, task.getDistanceSq()));
+                        buffers.builtBufferBuilders.remove(buffer);
                     }
                 }
 
@@ -152,7 +153,8 @@ public class ChunkRenderWorkerLitematica implements Runnable
                     {
                         //if (GuiBase.isCtrlDown()) System.out.printf("REBUILD_CHUNK pre uploadChunkOverlay()\n");
                         BufferBuilder buffer = buffers.getOverlayBuffer(type);
-                        futuresList.add(this.chunkRenderDispatcher.uploadChunkOverlay(type, buffer, renderChunk, chunkRenderData, task.getDistanceSq()));
+                        futuresList.add(this.chunkRenderDispatcher.uploadChunkOverlay(type, buffers.builtBufferBuilders.get(buffer), renderChunk, chunkRenderData, task.getDistanceSq()));
+                        buffers.builtBufferBuilders.remove(buffer);
                     }
                 }
             }
@@ -164,14 +166,16 @@ public class ChunkRenderWorkerLitematica implements Runnable
                 {
                     //System.out.printf("RESORT_TRANSPARENCY pre uploadChunkBlocks(%s)\n", layer.toString());
                     BufferBuilder buffer = buffers.getBlockBufferByLayer(layer);
-                    futuresList.add(this.chunkRenderDispatcher.uploadChunkBlocks(RenderLayer.getTranslucent(), buffer, renderChunk, chunkRenderData, task.getDistanceSq()));
+                    futuresList.add(this.chunkRenderDispatcher.uploadChunkBlocks(RenderLayer.getTranslucent(), buffers.builtBufferBuilders.get(buffer), renderChunk, chunkRenderData, task.getDistanceSq()));
+                    buffers.builtBufferBuilders.remove(buffer);
                 }
 
                 if (chunkRenderData.isOverlayTypeEmpty(OverlayRenderType.QUAD) == false)
                 {
                     //if (GuiBase.isCtrlDown()) System.out.printf("RESORT_TRANSPARENCY pre uploadChunkOverlay()\n");
                     BufferBuilder buffer = buffers.getOverlayBuffer(OverlayRenderType.QUAD);
-                    futuresList.add(this.chunkRenderDispatcher.uploadChunkOverlay(OverlayRenderType.QUAD, buffer, renderChunk, chunkRenderData, task.getDistanceSq()));
+                    futuresList.add(this.chunkRenderDispatcher.uploadChunkOverlay(OverlayRenderType.QUAD, buffers.builtBufferBuilders.get(buffer), renderChunk, chunkRenderData, task.getDistanceSq()));
+                    buffers.builtBufferBuilders.remove(buffer);
                 }
             }
 
@@ -228,7 +232,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
 
                     if ((throwable instanceof CancellationException) == false && (throwable instanceof InterruptedException) == false)
                     {
-                        MinecraftClient.getInstance().setCrashReportSupplier(() -> CrashReport.create(throwable, "Rendering Litematica chunk"));
+                        //MinecraftClient.getInstance().setCrashReportSupplier(() -> CrashReport.create(throwable, "Rendering Litematica chunk"));
                     }
                 }
             }, MoreExecutors.directExecutor());
